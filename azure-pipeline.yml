@@ -2,38 +2,56 @@
 # Build and push an image to Azure Container Registry
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
-trigger:
-- master
+ trigger:
+ - main
 
-resources:
-- repo: self
+ pool:
+   vmImage: 'ubuntu-latest' 
 
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'c7e78748-a666-4201-91af-10a1db6d2941'
-  imageRepository: 'juliakmpipelinesdotnetcoredocker'
-  containerRegistry: 'myakscontainerregistryjul5.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
-  tag: '$(Build.BuildId)'
+ variables:
+   imageName: 'pipelines-javascript-docker'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+ steps:
+ - task: Docker@2
+   displayName: Build an image
+   inputs:
+     repository: $(imageName)
+     command: build
+     dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+
+# trigger:
+# - master
+
+# resources:
+# - repo: self
+
+# variables:
+#   # Container registry service connection established during pipeline creation
+#   dockerRegistryServiceConnection: 'c7e78748-a666-4201-91af-10a1db6d2941'
+#   imageRepository: 'juliakmpipelinesdotnetcoredocker'
+#   containerRegistry: 'myakscontainerregistryjul5.azurecr.io'
+#   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+#   tag: '$(Build.BuildId)'
+
+#   # Agent VM image name
+#   vmImageName: 'ubuntu-latest'
+
+# stages:
+# - stage: Build
+#   displayName: Build and push stage
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: $(vmImageName)
+#     steps:
+#     - task: Docker@2
+#       displayName: Build and push an image to container registry
+#       inputs:
+#         command: buildAndPush
+#         repository: $(imageRepository)
+#         dockerfile: $(dockerfilePath)
+#         containerRegistry: $(dockerRegistryServiceConnection)
+#         tags: |
+#           $(tag)
